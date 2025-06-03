@@ -5,13 +5,13 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -90,13 +90,13 @@ fun AuthWebViewScreen(
     onBack: () -> Unit
 ) {
     var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Формуємо URL для авторизації
     val authUrl = remember(provider) {
-        val baseUrl = BuildConfig.API_BASE_URL.removeSuffix("api/")
         when (provider) {
-            WebViewAuthActivity.PROVIDER_GOOGLE -> "${baseUrl}api/auth/login-google"
-            WebViewAuthActivity.PROVIDER_FACEBOOK -> "${baseUrl}api/auth/login-facebook"
+            WebViewAuthActivity.PROVIDER_GOOGLE -> "${BuildConfig.API_BASE_URL}Auth/login-google"
+            WebViewAuthActivity.PROVIDER_FACEBOOK -> "${BuildConfig.API_BASE_URL}Auth/login-facebook"
             else -> ""
         }
     }
@@ -120,7 +120,7 @@ fun AuthWebViewScreen(
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back"
                     )
                 }
@@ -143,15 +143,42 @@ fun AuthWebViewScreen(
             }
         }
 
+        // Error message
+        errorMessage?.let { error ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Text(
+                    text = error,
+                    modifier = Modifier.padding(16.dp),
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        }
+
         // WebView
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
                 WebView(context).apply {
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    settings.setSupportZoom(true)
-                    settings.builtInZoomControls = false
+                    settings.apply {
+                        javaScriptEnabled = true
+                        domStorageEnabled = true
+                        setSupportZoom(true)
+                        builtInZoomControls = false
+                        // Додаткові налаштування для кращої сумісності
+                        mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                        useWideViewPort = true
+                        loadWithOverviewMode = true
+                        allowFileAccess = true
+                        allowContentAccess = true
+                        userAgentString = "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36"
+                    }
 
                     webViewClient = object : WebViewClient() {
 
@@ -159,6 +186,7 @@ fun AuthWebViewScreen(
                             super.onPageStarted(view, url, favicon)
                             Log.d("WebViewAuth", "Page started: $url")
                             isLoading = true
+                            errorMessage = null
                         }
 
                         override fun onPageFinished(view: WebView?, url: String?) {
@@ -170,8 +198,20 @@ fun AuthWebViewScreen(
                             url?.let { checkForAuthCallback(it, onTokenReceived, onError) }
                         }
 
-                        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                        // ТІЛЬКИ ОДИН shouldOverrideUrlLoading метод!
+                        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                            val url = request?.url?.toString()
                             Log.d("WebViewAuth", "URL loading: $url")
+
+                            // Додайте заголовки для Google запитів
+                            if (url?.contains("accounts.google.com") == true) {
+                                val headers = mapOf(
+                                    "User-Agent" to "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Mobile Safari/537.36"
+                                )
+                                view?.loadUrl(url, headers)
+                                return true
+                            }
+
                             url?.let {
                                 if (checkForAuthCallback(it, onTokenReceived, onError)) {
                                     return true
@@ -182,13 +222,39 @@ fun AuthWebViewScreen(
 
                         override fun onReceivedError(
                             view: WebView?,
+                            request: WebResourceRequest?,
+                            error: WebResourceError?
+                        ) {
+                            super.onReceivedError(view, request, error)
+                            val errorDesc = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                                error?.description?.toString() ?: "Unknown error"
+                            } else {
+                                "Connection error"
+                            }
+
+                            Log.e("WebViewAuth", "WebView error: $errorDesc")
+
+                            // Показуємо помилку тільки для основної URL
+                            if (request?.url?.toString()?.contains(BuildConfig.API_BASE_URL) == true) {
+                                errorMessage = "Connection failed: $errorDesc\nPlease check if the server is running on ${BuildConfig.API_BASE_URL}"
+                                isLoading = false
+                            }
+                        }
+
+                        @Deprecated("Deprecated in Java")
+                        override fun onReceivedError(
+                            view: WebView?,
                             errorCode: Int,
                             description: String?,
                             failingUrl: String?
                         ) {
                             super.onReceivedError(view, errorCode, description, failingUrl)
-                            Log.e("WebViewAuth", "WebView error: $description")
-                            onError("Failed to load: $description")
+                            Log.e("WebViewAuth", "WebView error (legacy): $description")
+
+                            if (failingUrl?.contains(BuildConfig.API_BASE_URL) == true) {
+                                errorMessage = "Connection failed: $description\nPlease check if the server is running"
+                                isLoading = false
+                            }
                         }
                     }
 
@@ -218,14 +284,31 @@ private fun checkForAuthCallback(
         val uri = Uri.parse(url)
 
         // Перевіряємо чи це callback URL
-        if (url.contains("auth-callback.html") || url.contains("token=")) {
+        if (url.contains("auth-callback") || url.contains("/callback") || url.contains("token=")) {
+            // Спробуємо знайти токен в URL параметрах
             val token = uri.getQueryParameter("token")
+                ?: uri.getQueryParameter("access_token")
+                ?: uri.getQueryParameter("authToken")
 
             if (!token.isNullOrEmpty()) {
                 Log.d("WebViewAuth", "Token received: ${token.take(20)}...")
                 onTokenReceived(token)
                 return true
             } else {
+                // Можливо токен в fragment
+                val fragment = uri.fragment
+                if (!fragment.isNullOrEmpty()) {
+                    val fragmentParams = fragment.split("&")
+                    for (param in fragmentParams) {
+                        val parts = param.split("=")
+                        if (parts.size == 2 && (parts[0] == "token" || parts[0] == "access_token")) {
+                            Log.d("WebViewAuth", "Token from fragment: ${parts[1].take(20)}...")
+                            onTokenReceived(parts[1])
+                            return true
+                        }
+                    }
+                }
+
                 Log.e("WebViewAuth", "No token in callback URL")
                 onError("No authentication token received")
                 return true
@@ -233,8 +316,10 @@ private fun checkForAuthCallback(
         }
 
         // Перевіряємо на помилки авторизації
-        if (url.contains("error")) {
-            val error = uri.getQueryParameter("error") ?: "Authentication failed"
+        if (url.contains("error") || url.contains("auth-failed")) {
+            val error = uri.getQueryParameter("error")
+                ?: uri.getQueryParameter("error_description")
+                ?: "Authentication failed"
             Log.e("WebViewAuth", "Auth error: $error")
             onError(error)
             return true

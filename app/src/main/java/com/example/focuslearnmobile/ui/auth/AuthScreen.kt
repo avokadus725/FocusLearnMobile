@@ -37,7 +37,7 @@ fun AuthScreen(
         when (result.resultCode) {
             WebViewAuthActivity.RESULT_AUTH_SUCCESS -> {
                 val token = result.data?.getStringExtra(WebViewAuthActivity.EXTRA_AUTH_TOKEN)
-                val provider = result.data?.getStringExtra(WebViewAuthActivity.EXTRA_AUTH_PROVIDER)
+                //val provider = result.data?.getStringExtra(WebViewAuthActivity.EXTRA_AUTH_PROVIDER)
 
                 if (!token.isNullOrEmpty()) {
                     viewModel.handleAuthSuccess(token)

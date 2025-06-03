@@ -1,6 +1,8 @@
+// app/src/main/java/com/example/focuslearnmobile/di/NetworkModule.kt
 package com.example.focuslearnmobile.di
 
 import android.content.Context
+import com.example.focuslearnmobile.BuildConfig
 import com.focuslearn.mobile.data.api.FocusLearnApi
 import com.example.focuslearnmobile.data.local.LanguageManager
 import com.example.focuslearnmobile.data.local.TokenStorage
@@ -45,7 +47,8 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://192.168.118.109:5000/api/")
+            // Використовуємо URL з BuildConfig
+            .baseUrl(BuildConfig.API_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -57,4 +60,3 @@ object NetworkModule {
         return retrofit.create(FocusLearnApi::class.java)
     }
 }
-
