@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Дозволи для мережі -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+            android:usesCleartextTraffic="true"
+    ... >
+            android:name="com.example.focuslearnmobile.FocusLearnApplication"
+            android:allowBackup="true"
+            android:dataExtractionRules="@xml/data_extraction_rules"
+            android:fullBackupContent="@xml/backup_rules"
+            android:label="@string/app_name"
+            android:supportsRtl="true"
+            android:theme="@style/Theme.FocusLearnMobile"
+            android:usesCleartextTraffic="true"
+            tools:targetApi="31">
+
+        <!-- Facebook App ID -->
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+                   android:value="@string/facebook_app_id"/>
+
+        <!-- Google Sign-In -->
+        <meta-data android:name="com.google.android.gms.auth.api.signin.GoogleSignInClient"
+                   android:value="@string/default_web_client_id" />
+
+
+        <activity
+                android:name="com.example.focuslearnmobile.MainActivity"
+                android:exported="true"
+                android:label="@string/app_name"
+                android:theme="@style/Theme.FocusLearnMobile">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name=".ui.auth.WebViewAuthActivity"
+                android:exported="false"
+                android:theme="@style/Theme.FocusLearnMobile" />
+    </application>
+
+</manifest>

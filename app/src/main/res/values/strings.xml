@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FocusLearnMobile</string>
+
+    <!-- Facebook App ID -->
+    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
+
+    <!-- Google Web Client ID -->
+    <string name="default_web_client_id">http://23159120457-0l075gjrmiikqdqsjbhr2u6jupvu6lto.apps.googleusercontent.com</string>
+</resources>
