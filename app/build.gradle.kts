@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.focuslearn.mobile"
+    namespace = "com.example.focuslearnmobile"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.focuslearn.mobile"
+        applicationId = "com.example.focuslearnmobile"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -115,4 +115,6 @@ dependencies {
     // Retrofit
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation("androidx.compose.runtime:runtime-livedata")
 }

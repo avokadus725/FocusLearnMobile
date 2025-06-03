@@ -25,6 +25,9 @@ class TokenStorage @Inject constructor(
         private val USER_EMAIL_KEY = stringPreferencesKey("user_email")
         private val USER_NAME_KEY = stringPreferencesKey("user_name")
         private val USER_PHOTO_KEY = stringPreferencesKey("user_photo")
+        private val USER_LANGUAGE_KEY = stringPreferencesKey("user_language")
+        private val USER_ROLE_KEY = stringPreferencesKey("user_role")
+        private val USER_STATUS_KEY = stringPreferencesKey("user_status")
     }
 
     // Збереження токена
@@ -41,6 +44,9 @@ class TokenStorage @Inject constructor(
             preferences[USER_EMAIL_KEY] = user.email
             preferences[USER_NAME_KEY] = user.userName
             user.profilePhoto?.let { preferences[USER_PHOTO_KEY] = it }
+            user.language?.let { preferences[USER_LANGUAGE_KEY] = it }
+            user.role?.let { preferences[USER_ROLE_KEY] = it }
+            user.profileStatus?.let { preferences[USER_STATUS_KEY] = it }
         }
     }
 
@@ -52,6 +58,16 @@ class TokenStorage @Inject constructor(
     // Отримання ID користувача
     val userId: Flow<String?> = context.dataStore.data.map { preferences ->
         preferences[USER_ID_KEY]
+    }
+
+    // Отримання email користувача
+    val userEmail: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[USER_EMAIL_KEY]
+    }
+
+    // Отримання імені користувача
+    val userName: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[USER_NAME_KEY]
     }
 
     // Отримання даних користувача
@@ -66,9 +82,9 @@ class TokenStorage @Inject constructor(
                 userName = name,
                 email = email,
                 profilePhoto = preferences[USER_PHOTO_KEY],
-                language = null,
-                role = null,
-                profileStatus = null
+                language = preferences[USER_LANGUAGE_KEY],
+                role = preferences[USER_ROLE_KEY],
+                profileStatus = preferences[USER_STATUS_KEY]
             )
         } else null
     }

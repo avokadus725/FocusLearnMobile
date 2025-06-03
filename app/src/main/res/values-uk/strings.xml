@@ -1,0 +1,45 @@
+<!-- app/src/main/res/values-uk/strings.xml -->
+<resources>
+    <string name="app_name">FocusLearn</string>
+
+    <!-- Facebook App ID -->
+    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
+
+    <!-- Auth Screen -->
+    <string name="welcome_message">Ласкаво просимо! Увійдіть, щоб продовжити</string>
+    <string name="continue_with_google">Продовжити з Google</string>
+    <string name="continue_with_facebook">Продовжити з Facebook</string>
+    <string name="google_auth">Авторизація Google</string>
+    <string name="facebook_auth">Авторизація Facebook</string>
+    <string name="auth">Авторизація</string>
+    <string name="back">Назад</string>
+    <string name="loading">Завантаження…</string>
+
+    <!-- Main Screen -->
+    <string name="test_methods">Тест Методики</string>
+    <string name="test_materials">Тест Матеріали</string>
+    <string name="api_endpoints_testing">Тестування API endpoints</string>
+    <string name="press_button_to_test">Натисніть кнопку для тестування</string>
+
+    <!-- Errors -->
+    <string name="auth_failed">Помилка авторизації</string>
+    <string name="network_error">Помилка мережі. Перевірте підключення до інтернету.</string>
+    <string name="unknown_error">Сталася невідома помилка</string>
+    <string name="invalid_auth_provider">Невірний провайдер авторизації</string>
+    <string name="no_token_received">Токен авторизації не отримано</string>
+    <string name="failed_to_load">Не вдалося завантажити</string>
+
+    <!-- Success messages -->
+    <string name="methods_loaded_success">✅ Успіх! Завантажено %1$d методик:</string>
+    <string name="materials_loaded_success">✅ Успіх! Завантажено %1$d навчальних матеріалів:</string>
+    <string name="loading_methods">Завантаження методик…</string>
+    <string name="loading_materials">Завантаження матеріалів…</string>
+
+    <!-- Common -->
+    <string name="error_prefix">❌ Помилка: %1$s</string>
+    <string name="retry">Повторити</string>
+    <string name="logout">Вийти</string>
+    <string name="settings">Налаштування</string>
+    <string name="language">Мова</string>
+    <string name="profile">Профіль</string>
+</resources>

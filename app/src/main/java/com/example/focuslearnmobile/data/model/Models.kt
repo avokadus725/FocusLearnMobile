@@ -148,6 +148,11 @@ data class StartSessionRequest(
     val methodId: Int
 )
 
+data class SubmitAssignmentRequest(
+    @SerializedName("fileLink")
+    val fileLink: String
+)
+
 data class UpdateProfileDTO(
     @SerializedName("userName")
     val userName: String?,
@@ -155,4 +160,15 @@ data class UpdateProfileDTO(
     val profilePhoto: String?,
     @SerializedName("language")
     val language: String?
+)
+
+// Відповіді для статистики
+data class ProductivityCoefficientResponse(
+    @SerializedName("productivityCoefficient")
+    val productivityCoefficient: Double
+)
+
+data class MostEffectiveMethodResponse(
+    @SerializedName("message")
+    val message: String
 )

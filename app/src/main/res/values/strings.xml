@@ -1,9 +1,48 @@
+<!-- app/src/main/res/values/strings.xml -->
 <resources>
-    <string name="app_name">FocusLearnMobile</string>
+    <string name="app_name">FocusLearn</string>
 
     <!-- Facebook App ID -->
     <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
 
     <!-- Google Web Client ID -->
-    <string name="default_web_client_id">http://23159120457-0l075gjrmiikqdqsjbhr2u6jupvu6lto.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">23159120457-0l075gjrmiikqdqsjbhr2u6jupvu6lto.apps.googleusercontent.com</string>
+
+    <!-- Auth Screen -->
+    <string name="welcome_message">Welcome! Please sign in to continue</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="continue_with_facebook">Continue with Facebook</string>
+    <string name="google_auth">Google Auth</string>
+    <string name="facebook_auth">Facebook Auth</string>
+    <string name="auth">Auth</string>
+    <string name="back">Back</string>
+    <string name="loading">Loading…</string>
+
+    <!-- Main Screen -->
+    <string name="test_methods">Test Methods</string>
+    <string name="test_materials">Test Materials</string>
+    <string name="api_endpoints_testing">API endpoints testing</string>
+    <string name="press_button_to_test">Press button to test</string>
+
+    <!-- Errors -->
+    <string name="auth_failed">Authentication failed</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+    <string name="unknown_error">An unknown error occurred</string>
+    <string name="invalid_auth_provider">Invalid auth provider</string>
+    <string name="no_token_received">No authentication token received</string>
+    <string name="failed_to_load">Failed to load</string>
+
+    <!-- Success messages -->
+    <string name="methods_loaded_success">✅ Success! Loaded %1$d methods:</string>
+    <string name="materials_loaded_success">✅ Success! Loaded %1$d learning materials:</string>
+    <string name="loading_methods">Loading methods…</string>
+    <string name="loading_materials">Loading materials…</string>
+
+    <!-- Common -->
+    <string name="error_prefix">❌ Error: %1$s</string>
+    <string name="retry">Retry</string>
+    <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
+    <string name="language">Language</string>
+    <string name="profile">Profile</string>
 </resources>

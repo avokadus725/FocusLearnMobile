@@ -1,9 +1,13 @@
 package com.example.focuslearnmobile.di
 
-import com.example.focuslearnmobile.data.api.FocusLearnApi
+import android.content.Context
+import com.focuslearn.mobile.data.api.FocusLearnApi
+import com.example.focuslearnmobile.data.local.LanguageManager
+import com.example.focuslearnmobile.data.local.TokenStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -53,3 +57,4 @@ object NetworkModule {
         return retrofit.create(FocusLearnApi::class.java)
     }
 }
+

@@ -1,18 +1,12 @@
 package com.focuslearn.mobile.data.api
 
-import com.example.focuslearnmobile.data.model.DirectAuthRequest
-import com.example.focuslearnmobile.data.model.AuthResponse
 import com.focuslearn.mobile.data.model.*
-import com.google.gson.annotations.SerializedName
 import retrofit2.Response
 import retrofit2.http.*
 
 interface FocusLearnApi {
 
-    // === АВТОРИЗАЦІЯ ===
-    @POST("auth/direct-login")
-    suspend fun directAuth(@Body request: DirectAuthRequest): Response<ApiResponse<AuthResponse>>
-
+    // === АВТОРИЗАЦІЯ (тільки для перевірки токена) ===
     @GET("users/my-profile")
     suspend fun getMyProfile(@Header("Authorization") token: String): Response<ApiResponse<UserDTO>>
 
@@ -118,19 +112,3 @@ interface FocusLearnApi {
         @Query("periodType") periodType: String
     ): Response<MostEffectiveMethodResponse>
 }
-
-// Додаткові моделі для запитів
-data class SubmitAssignmentRequest(
-    @SerializedName("fileLink")
-    val fileLink: String
-)
-
-data class ProductivityCoefficientResponse(
-    @SerializedName("productivityCoefficient")
-    val productivityCoefficient: Double
-)
-
-data class MostEffectiveMethodResponse(
-    @SerializedName("message")
-    val message: String
-)
