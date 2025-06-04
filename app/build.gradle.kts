@@ -19,7 +19,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API URLs для різних build types
-        buildConfigField("String", "API_BASE_URL", "\"https://764b-79-117-90-80.ngrok-free.app/api/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://334d-79-117-90-80.ngrok-free.app/api/\"")
     }
 
     buildTypes {
@@ -29,10 +29,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "API_BASE_URL", "\"https://764b-79-117-90-80.ngrok-free.app/api/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://334d-79-117-90-80.ngrok-free.app/api/\"")
         }
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"https://764b-79-117-90-80.ngrok-free.app/api/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://334d-79-117-90-80.ngrok-free.app/api/\"")
         }
     }
 
@@ -117,4 +117,19 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation("androidx.compose.runtime:runtime-livedata")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.6")
+
+    // Compose animations
+    implementation("androidx.compose.animation:animation:1.5.8")
+
+    // Hilt Navigation Compose
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+
+    // Для роботи з датами (LocalDate)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
 }

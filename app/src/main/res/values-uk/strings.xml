@@ -32,7 +32,6 @@
     <!-- Success messages -->
     <string name="methods_loaded_success">✅ Успіх! Завантажено %1$d методик:</string>
     <string name="materials_loaded_success">✅ Успіх! Завантажено %1$d навчальних матеріалів:</string>
-    <string name="loading_methods">Завантаження методик…</string>
     <string name="loading_materials">Завантаження матеріалів…</string>
 
     <!-- Common -->
@@ -42,4 +41,49 @@
     <string name="settings">Налаштування</string>
     <string name="language">Мова</string>
     <string name="profile">Профіль</string>
+
+    <!-- Timer and Methods -->
+    <string name="select_concentration_method">Оберіть методику концентрації</string>
+    <string name="choose_method_description">Виберіть техніку концентрації, яка найбільше вам підходить</string>
+    <string name="loading_methods">Завантаження методик…</string>
+    <string name="error_loading_methods">Помилка завантаження методик</string>
+    <string name="no_methods_available">Немає доступних методик</string>
+    <string name="start_session">Почати сесію</string>
+    <string name="work_duration">Робота</string>
+    <string name="break_duration">Перерва</string>
+    <string name="minutes_short">хв</string>
+
+    <!-- Timer Screen -->
+    <string name="work_phase">Фаза роботи</string>
+    <string name="break_phase">Фаза перерви</string>
+    <string name="cycle_number">Цикл %d</string>
+    <string name="timer_paused">На паузі</string>
+    <string name="pause_session">Пауза</string>
+    <string name="resume_session">Продовжити</string>
+    <string name="stop_session">Зупинити</string>
+    <string name="keep_app_open_warning">Тримайте додаток відкритим під час сесії</string>
+
+    <!-- Timer Actions -->
+    <string name="session_started">Сесію успішно розпочато</string>
+    <string name="session_paused">Сесію поставлено на паузу</string>
+    <string name="session_resumed">Сесію відновлено</string>
+    <string name="session_stopped">Сесію зупинено</string>
+    <string name="phase_completed">Фазу завершено</string>
+
+    <!-- Statistics -->
+    <string name="statistics">Статистика</string>
+    <string name="daily_stats">День</string>
+    <string name="weekly_stats">Тиждень</string>
+    <string name="monthly_stats">Місяць</string>
+    <string name="total_concentration_time">Загальний час концентрації</string>
+    <string name="completed_sessions">Завершені сесії</string>
+    <string name="productivity_score">Оцінка продуктивності</string>
+    <string name="most_effective_method">Найефективніша методика</string>
+    <string name="hours_short">г</string>
+    <string name="minutes_full">хвилин</string>
+
+    <!-- Navigation -->
+    <string name="timer">Таймер</string>
+    <string name="methods">Методики</string>
+    <string name="stats">Статистика</string>
 </resources>

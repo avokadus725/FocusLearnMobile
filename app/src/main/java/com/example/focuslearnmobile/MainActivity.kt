@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.focuslearnmobile.ui.navigation.MainNavigationScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -59,8 +60,7 @@ fun MainApp(
     val authState by authViewModel.authState.collectAsState()
 
     if (authState.isAuthenticated) {
-        MainScreen(
-            viewModel = mainViewModel,
+        MainNavigationScreen(
             onLogout = { authViewModel.logout() }
         )
     } else {

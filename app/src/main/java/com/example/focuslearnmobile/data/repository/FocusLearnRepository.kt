@@ -140,12 +140,14 @@ class FocusLearnRepository @Inject constructor(
     }
 
     // === ТАЙМЕР ===
-    suspend fun startSession(methodId: Int): Result<ActiveSessionDTO> = withContext(Dispatchers.IO) {
+    suspend fun startTimerSession(methodId: Int): Result<ActiveSessionDTO> = withContext(Dispatchers.IO) {
         try {
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<ActiveSessionDTO>("No authentication token")
 
-            val response = api.startSession(authToken, StartSessionRequest(methodId))
+            val request = com.example.focuslearnmobile.data.model.StartSessionRequest(methodId)
+            val response = api.startSession(authToken, request)
+
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
                     if (apiResponse.success && apiResponse.data != null) {
@@ -155,41 +157,20 @@ class FocusLearnRepository @Inject constructor(
                     }
                 } ?: Result.Error("Empty response")
             } else {
-                Result.Error("Failed to start session: ${response.code()}")
+                Result.Error("Server error: ${response.code()}")
             }
         } catch (e: Exception) {
             Result.Error("Network error: ${e.localizedMessage}")
         }
     }
 
-    suspend fun getSessionStatus(): Result<ActiveSessionDTO?> = withContext(Dispatchers.IO) {
-        try {
-            val authToken = getAuthToken()
-                ?: return@withContext Result.Error<ActiveSessionDTO?>("No authentication token")
-
-            val response = api.getSessionStatus(authToken)
-            if (response.isSuccessful) {
-                response.body()?.let { apiResponse ->
-                    if (apiResponse.success) {
-                        Result.Success(apiResponse.data)
-                    } else {
-                        Result.Error(apiResponse.message ?: "Failed to get session status")
-                    }
-                } ?: Result.Error("Empty response")
-            } else {
-                Result.Error("Failed to get session status: ${response.code()}")
-            }
-        } catch (e: Exception) {
-            Result.Error("Network error: ${e.localizedMessage}")
-        }
-    }
-
-    suspend fun pauseSession(): Result<ActiveSessionDTO> = withContext(Dispatchers.IO) {
+    suspend fun pauseTimerSession(): Result<ActiveSessionDTO> = withContext(Dispatchers.IO) {
         try {
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<ActiveSessionDTO>("No authentication token")
 
             val response = api.pauseSession(authToken)
+
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
                     if (apiResponse.success && apiResponse.data != null) {
@@ -199,19 +180,20 @@ class FocusLearnRepository @Inject constructor(
                     }
                 } ?: Result.Error("Empty response")
             } else {
-                Result.Error("Failed to pause session: ${response.code()}")
+                Result.Error("Server error: ${response.code()}")
             }
         } catch (e: Exception) {
             Result.Error("Network error: ${e.localizedMessage}")
         }
     }
 
-    suspend fun stopSession(): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun stopTimerSession(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<Unit>("No authentication token")
 
             val response = api.stopSession(authToken)
+
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
                     if (apiResponse.success) {
@@ -221,7 +203,38 @@ class FocusLearnRepository @Inject constructor(
                     }
                 } ?: Result.Error("Empty response")
             } else {
-                Result.Error("Failed to stop session: ${response.code()}")
+                Result.Error("Server error: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Result.Error("Network error: ${e.localizedMessage}")
+        }
+    }
+
+    suspend fun getTimerStatus(): Result<ActiveSessionDTO?> = withContext(Dispatchers.IO) {
+        try {
+            val authToken = getAuthToken()
+                ?: return@withContext Result.Error<ActiveSessionDTO?>("No authentication token")
+
+            val response = api.getSessionStatus(authToken)
+
+            if (response.isSuccessful) {
+                response.body()?.let { apiResponse ->
+                    if (apiResponse.success && apiResponse.data != null) {
+                        val session = apiResponse.data
+                        // Валідуємо дані перед поверненням
+                        if (session.userId > 0 && session.methodId > 0) {
+                            Result.Success(session)
+                        } else {
+                            // Дані невалідні, повертаємо null (немає активної сесії)
+                            Result.Success(null)
+                        }
+                    } else {
+                        // Немає активної сесії або помилка
+                        Result.Success(null)
+                    }
+                } ?: Result.Error("Empty response")
+            } else {
+                Result.Error("Server error: ${response.code()}")
             }
         } catch (e: Exception) {
             Result.Error("Network error: ${e.localizedMessage}")
@@ -234,6 +247,7 @@ class FocusLearnRepository @Inject constructor(
                 ?: return@withContext Result.Error<ActiveSessionDTO>("No authentication token")
 
             val response = api.completeCurrentPhase(authToken)
+
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
                     if (apiResponse.success && apiResponse.data != null) {
@@ -243,13 +257,12 @@ class FocusLearnRepository @Inject constructor(
                     }
                 } ?: Result.Error("Empty response")
             } else {
-                Result.Error("Failed to complete phase: ${response.code()}")
+                Result.Error("Server error: ${response.code()}")
             }
         } catch (e: Exception) {
             Result.Error("Network error: ${e.localizedMessage}")
         }
     }
-
     // === ЗАВДАННЯ ===
     suspend fun getAvailableAssignments(): Result<List<AssignmentDTO>> = withContext(Dispatchers.IO) {
         try {
@@ -471,8 +484,12 @@ class FocusLearnRepository @Inject constructor(
 
             val response = api.getProductivityCoefficient(authToken, periodStartDate, periodType)
             if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.Success(it)
+                response.body()?.let { apiResponse ->
+                    if (apiResponse.success && apiResponse.data != null) {
+                        Result.Success(apiResponse.data)
+                    } else {
+                        Result.Error(apiResponse.message ?: "Failed to get productivity coefficient")
+                    }
                 } ?: Result.Error("Empty response")
             } else {
                 Result.Error("Server error: ${response.code()}")
@@ -489,8 +506,12 @@ class FocusLearnRepository @Inject constructor(
 
             val response = api.getMostEffectiveMethod(authToken, periodStartDate, periodType)
             if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.Success(it)
+                response.body()?.let { apiResponse ->
+                    if (apiResponse.success && apiResponse.data != null) {
+                        Result.Success(apiResponse.data)
+                    } else {
+                        Result.Error(apiResponse.message ?: "Failed to get most effective method")
+                    }
                 } ?: Result.Error("Empty response")
             } else {
                 Result.Error("Server error: ${response.code()}")

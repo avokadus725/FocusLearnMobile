@@ -1,12 +1,13 @@
 package com.focuslearn.mobile.data.api
 
+import com.example.focuslearnmobile.data.model.StartSessionRequest
 import com.focuslearn.mobile.data.model.*
 import retrofit2.Response
 import retrofit2.http.*
 
 interface FocusLearnApi {
 
-    // === АВТОРИЗАЦІЯ (тільки для перевірки токена) ===
+    // === АВТОРИЗАЦІЯ ===
     @GET("users/my-profile")
     suspend fun getMyProfile(@Header("Authorization") token: String): Response<ApiResponse<UserDTO>>
 
@@ -103,12 +104,12 @@ interface FocusLearnApi {
         @Header("Authorization") token: String,
         @Query("periodStartDate") periodStartDate: String,
         @Query("periodType") periodType: String
-    ): Response<ProductivityCoefficientResponse>
+    ): Response<ApiResponse<ProductivityCoefficientResponse>>
 
     @GET("businesslogic/most-effective-method")
     suspend fun getMostEffectiveMethod(
         @Header("Authorization") token: String,
         @Query("periodStartDate") periodStartDate: String,
         @Query("periodType") periodType: String
-    ): Response<MostEffectiveMethodResponse>
+    ): Response<ApiResponse<MostEffectiveMethodResponse>>
 }
