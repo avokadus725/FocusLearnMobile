@@ -13,7 +13,7 @@
             android:fullBackupContent="@xml/backup_rules"
             android:label="@string/app_name"
             android:supportsRtl="true"
-            android:theme="@style/Theme.FocusLearnMobile"
+            android:theme="@style/Theme.FocusLearn"
             android:usesCleartextTraffic="true"
             tools:targetApi="31">
 
@@ -27,7 +27,7 @@
                 android:name="com.example.focuslearnmobile.MainActivity"
                 android:exported="true"
                 android:label="@string/app_name"
-                android:theme="@style/Theme.FocusLearnMobile">
+                android:theme="@style/Theme.FocusLearn">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -38,7 +38,7 @@
         <activity
                 android:name="com.example.focuslearnmobile.ui.auth.WebViewAuthActivity"
                 android:exported="false"
-                android:theme="@style/Theme.FocusLearnMobile"
+                android:theme="@style/Theme.FocusLearn"
                 android:configChanges="orientation|screenSize|keyboardHidden"
                 android:hardwareAccelerated="true" />
     </application>

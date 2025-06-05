@@ -1,10 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Colors - зелені відтінки як у веб-версії -->
+    <color name="primary_50">#e6f4ea</color>
+    <color name="primary_100">#cce9d5</color>
+    <color name="primary_200">#b3dfc0</color>
+    <color name="primary_300">#99d4ab</color>
+    <color name="primary_400">#80c996</color> <!-- Основний зелений -->
+    <color name="primary_500">#66bf81</color>
+    <color name="primary_600">#4cb46c</color> <!-- Для hover/pressed -->
+    <color name="primary_700">#339957</color>
+    <color name="primary_800">#1a7e42</color>
+    <color name="primary_900">#00642d</color>
+
+    <!-- Secondary Colors -->
+    <color name="secondary_50">#f0f9f4</color>
+    <color name="secondary_100">#e0f3e8</color>
+    <color name="secondary_200">#d1eddd</color>
+    <color name="secondary_300">#c1e7d1</color>
+    <color name="secondary_400">#b2e1c6</color>
+    <color name="secondary_500">#a2dbba</color>
+
+    <!-- Grayscale -->
+    <color name="gray_50">#f9fafb</color>
+    <color name="gray_100">#f3f4f6</color>
+    <color name="gray_200">#e5e7eb</color>
+    <color name="gray_300">#d1d5db</color>
+    <color name="gray_400">#9ca3af</color>
+    <color name="gray_500">#6b7280</color>
+    <color name="gray_600">#4b5563</color>
+    <color name="gray_700">#374151</color>
+    <color name="gray_800">#1f2937</color>
+    <color name="gray_900">#111827</color>
+
+    <!-- Functional Colors -->
+    <color name="success_500">#22c55e</color>
+    <color name="success_600">#16a34a</color>
+    <color name="warning_500">#f59e0b</color>
+    <color name="warning_600">#d97706</color>
+    <color name="danger_500">#ef4444</color>
+    <color name="danger_600">#dc2626</color>
+    <color name="info_500">#3b82f6</color>
+    <color name="info_600">#2563eb</color>
+
+    <!-- Основні кольори для системи -->
+    <color name="colorPrimary">@color/primary_400</color>
+    <color name="colorPrimaryVariant">@color/primary_600</color>
+    <color name="colorOnPrimary">@color/white</color>
+    <color name="colorSecondary">@color/secondary_400</color>
+    <color name="colorSecondaryVariant">@color/secondary_500</color>
+    <color name="colorOnSecondary">@color/gray_800</color>
+
+    <!-- Background Colors -->
+    <color name="colorBackground">@color/primary_50</color>
+    <color name="colorSurface">@color/white</color>
+    <color name="colorOnBackground">@color/gray_800</color>
+    <color name="colorOnSurface">@color/gray_800</color>
+
+    <!-- Basic Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
 </resources>

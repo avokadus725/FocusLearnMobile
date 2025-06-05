@@ -19,7 +19,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API URLs для різних build types
-        buildConfigField("String", "API_BASE_URL", "\"https://334d-79-117-90-80.ngrok-free.app/api/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://7ac0-79-117-84-80.ngrok-free.app/api/\"")
     }
 
     buildTypes {
@@ -29,10 +29,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "API_BASE_URL", "\"https://334d-79-117-90-80.ngrok-free.app/api/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://7ac0-79-117-84-80.ngrok-free.app/api/\"")
         }
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"https://334d-79-117-90-80.ngrok-free.app/api/\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://7ac0-79-117-84-80.ngrok-free.app/api/\"")
         }
     }
 
@@ -56,6 +56,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.material:material:1.9.0")
     // Core Android
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

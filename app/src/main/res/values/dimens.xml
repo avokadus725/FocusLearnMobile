@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing (відповідає веб CSS змінним) -->
+    <dimen name="space_0">0dp</dimen>
+    <dimen name="space_1">4dp</dimen>   <!-- var(-space-1) -->
+    <dimen name="space_2">8dp</dimen>   <!-- var(-space-2) -->
+    <dimen name="space_3">12dp</dimen>  <!-- var(-space-3) -->
+    <dimen name="space_4">16dp</dimen>  <!-- var(-space-4) -->
+    <dimen name="space_5">20dp</dimen>  <!-- var(-space-5) -->
+    <dimen name="space_6">24dp</dimen>  <!-- var(-space-6) -->
+    <dimen name="space_8">32dp</dimen>  <!-- var(-space-8) -->
+    <dimen name="space_10">40dp</dimen> <!-- var(-space-10) -->
+    <dimen name="space_12">48dp</dimen> <!-- var(-space-12) -->
+    <dimen name="space_16">64dp</dimen> <!-- var(-space-16) -->
+    <dimen name="space_20">80dp</dimen> <!-- var(-space-20) -->
+    <dimen name="space_24">96dp</dimen> <!-- var(-space-24) -->
+
+    <!-- Border radius (відповідає CSS радіусам) -->
+    <dimen name="radius_sm">2dp</dimen>   <!-- var(-radius-sm) -->
+    <dimen name="radius_md">6dp</dimen>   <!-- var(-radius-md) -->
+    <dimen name="radius_lg">8dp</dimen>   <!-- var(-radius-lg) -->
+    <dimen name="radius_xl">12dp</dimen>  <!-- var(-radius-xl) -->
+    <dimen name="radius_2xl">16dp</dimen> <!-- var(-radius-2xl) -->
+    <dimen name="radius_3xl">24dp</dimen> <!-- var(-radius-3xl) -->
+
+    <!-- Card dimensions -->
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_padding">@dimen/space_4</dimen>
+    <dimen name="card_margin">@dimen/space_2</dimen>
+    <dimen name="card_corner_radius">@dimen/radius_xl</dimen>
+
+    <!-- Button dimensions -->
+    <dimen name="button_padding_horizontal">@dimen/space_4</dimen>
+    <dimen name="button_padding_vertical">@dimen/space_3</dimen>
+    <dimen name="button_corner_radius">@dimen/radius_lg</dimen>
+    <dimen name="button_elevation">2dp</dimen>
+
+    <!-- Icon sizes -->
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">32dp</dimen>
+    <dimen name="icon_size_xl">48dp</dimen>
+
+    <!-- Text sizes -->
+    <dimen name="text_size_xs">12sp</dimen>
+    <dimen name="text_size_sm">14sp</dimen>
+    <dimen name="text_size_base">16sp</dimen>
+    <dimen name="text_size_lg">18sp</dimen>
+    <dimen name="text_size_xl">20sp</dimen>
+    <dimen name="text_size_2xl">24sp</dimen>
+    <dimen name="text_size_3xl">30sp</dimen>
+    <dimen name="text_size_4xl">36sp</dimen>
+
+    <!-- Layout margins -->
+    <dimen name="activity_horizontal_margin">@dimen/space_4</dimen>
+    <dimen name="activity_vertical_margin">@dimen/space_4</dimen>
+    <dimen name="fragment_padding">@dimen/space_4</dimen>
+
+    <!-- List item dimensions -->
+    <dimen name="list_item_padding">@dimen/space_4</dimen>
+    <dimen name="list_item_margin">@dimen/space_2</dimen>
+    <dimen name="list_item_height">72dp</dimen>
+
+</resources>
