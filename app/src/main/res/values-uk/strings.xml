@@ -86,4 +86,14 @@
     <string name="timer">Таймер</string>
     <string name="methods">Методики</string>
     <string name="stats">Статистика</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">Оберіть мову</string>
+    <string name="cancel">Скасувати</string>
+    <string name="language_changed">Мову змінено</string>
+    <string name="restart_app_message">Перезапустіть додаток для застосування змін мови</string>
+
+    <!-- Settings -->
+    <string name="appearance">Зовнішній вигляд</string>
+    <string name="preferences">Налаштування</string>
 </resources>

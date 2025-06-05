@@ -89,4 +89,14 @@
     <string name="timer">Timer</string>
     <string name="methods">Methods</string>
     <string name="stats">Statistics</string>
+
+    <!-- Language Selection -->
+    <string name="select_language">Select Language</string>
+    <string name="cancel">Cancel</string>
+    <string name="language_changed">Language changed</string>
+    <string name="restart_app_message">Please restart the app to apply language changes</string>
+
+    <!-- Settings -->
+    <string name="appearance">Appearance</string>
+    <string name="preferences">Preferences</string>
 </resources>

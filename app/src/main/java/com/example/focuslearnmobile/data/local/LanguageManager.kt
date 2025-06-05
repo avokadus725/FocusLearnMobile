@@ -1,6 +1,8 @@
+// Оновіть app/src/main/java/com/example/focuslearnmobile/data/local/LanguageManager.kt
+
 package com.example.focuslearnmobile.data.local
 
-
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import androidx.datastore.core.DataStore
@@ -36,12 +38,15 @@ class LanguageManager @Inject constructor(
         preferences[LANGUAGE_KEY] ?: getSystemDefaultLanguage()
     }
 
-    // Збереження мови
+    // Збереження мови з застосуванням
     suspend fun setLanguage(languageCode: String) {
         if (languageCode in SUPPORTED_LANGUAGES) {
             context.languageDataStore.edit { preferences ->
                 preferences[LANGUAGE_KEY] = languageCode
             }
+
+            // Застосовуємо мову негайно
+            applyLanguageToContext(context, languageCode)
         }
     }
 
@@ -61,7 +66,7 @@ class LanguageManager @Inject constructor(
     }
 
     // Застосування мови до контексту
-    fun applyLanguage(context: Context, languageCode: String): Context {
+    fun applyLanguageToContext(context: Context, languageCode: String): Context {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
 
@@ -69,6 +74,22 @@ class LanguageManager @Inject constructor(
         config.setLocale(locale)
 
         return context.createConfigurationContext(config)
+    }
+
+    // Новий метод для застосування мови до поточної Activity
+    fun applyLanguageToActivity(activity: Activity, languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+
+        val config = Configuration(activity.resources.configuration)
+        config.setLocale(locale)
+
+        activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
+    }
+
+    // Перезапуск Activity для повного застосування мови
+    fun restartActivity(activity: Activity) {
+        activity.recreate()
     }
 
     // Отримання назви мови для відображення

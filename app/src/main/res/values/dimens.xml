@@ -22,6 +22,7 @@
     <dimen name="radius_xl">12dp</dimen>  <!-- var(-radius-xl) -->
     <dimen name="radius_2xl">16dp</dimen> <!-- var(-radius-2xl) -->
     <dimen name="radius_3xl">24dp</dimen> <!-- var(-radius-3xl) -->
+    <dimen name="radius_full">50dp</dimen> <!-- var(-radius-full) -->
 
     <!-- Card dimensions -->
     <dimen name="card_elevation">4dp</dimen>
@@ -34,12 +35,17 @@
     <dimen name="button_padding_vertical">@dimen/space_3</dimen>
     <dimen name="button_corner_radius">@dimen/radius_lg</dimen>
     <dimen name="button_elevation">2dp</dimen>
+    <dimen name="button_height_small">32dp</dimen>
+    <dimen name="button_height_medium">40dp</dimen>
+    <dimen name="button_height_large">48dp</dimen>
+    <dimen name="button_height_xl">56dp</dimen>
 
     <!-- Icon sizes -->
     <dimen name="icon_size_small">16dp</dimen>
     <dimen name="icon_size_medium">24dp</dimen>
     <dimen name="icon_size_large">32dp</dimen>
     <dimen name="icon_size_xl">48dp</dimen>
+    <dimen name="icon_size_2xl">64dp</dimen>
 
     <!-- Text sizes -->
     <dimen name="text_size_xs">12sp</dimen>
@@ -60,5 +66,54 @@
     <dimen name="list_item_padding">@dimen/space_4</dimen>
     <dimen name="list_item_margin">@dimen/space_2</dimen>
     <dimen name="list_item_height">72dp</dimen>
+
+    <!-- Elevation values -->
+    <dimen name="elevation_sm">2dp</dimen>
+    <dimen name="elevation_md">4dp</dimen>
+    <dimen name="elevation_lg">8dp</dimen>
+    <dimen name="elevation_xl">12dp</dimen>
+    <dimen name="elevation_2xl">16dp</dimen>
+
+    <!-- Divider sizes -->
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="divider_thick">2dp</dimen>
+
+    <!-- Bottom navigation -->
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="bottom_nav_elevation">8dp</dimen>
+
+    <!-- Toolbar/App bar -->
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_elevation">4dp</dimen>
+
+    <!-- FAB dimensions -->
+    <dimen name="fab_size_normal">56dp</dimen>
+    <dimen name="fab_size_mini">40dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+
+    <!-- Dialog dimensions -->
+    <dimen name="dialog_corner_radius">@dimen/radius_2xl</dimen>
+    <dimen name="dialog_padding">@dimen/space_6</dimen>
+    <dimen name="dialog_margin">@dimen/space_4</dimen>
+
+    <!-- Input field dimensions -->
+    <dimen name="input_height">48dp</dimen>
+    <dimen name="input_corner_radius">@dimen/radius_lg</dimen>
+    <dimen name="input_padding_horizontal">@dimen/space_4</dimen>
+    <dimen name="input_padding_vertical">@dimen/space_3</dimen>
+
+    <!-- Progress indicator sizes -->
+    <dimen name="progress_size_small">24dp</dimen>
+    <dimen name="progress_size_medium">32dp</dimen>
+    <dimen name="progress_size_large">48dp</dimen>
+
+    <!-- Timer specific dimensions -->
+    <dimen name="timer_circle_size">280dp</dimen>
+    <dimen name="timer_stroke_width">12dp</dimen>
+    <dimen name="timer_icon_size">48dp</dimen>
+
+    <!-- Statistics card dimensions -->
+    <dimen name="stat_card_height">120dp</dimen>
+    <dimen name="stat_card_icon_size">40dp</dimen>
 
 </resources>

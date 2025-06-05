@@ -1,136 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Мінімальні стилі без складних залежностей -->
 
-    <!-- Стилі для різних компонентів -->
+    <!-- Базовий стиль для текстових елементів -->
+    <style name="FocusLearnText">
+        <item name="android:textColor">@color/neutral_800</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
 
-    <!-- TextView Styles -->
-    <style name="TextView.FocusLearn.Title" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/gray_800</item>
+    <!-- Заголовок -->
+    <style name="FocusLearnText.Title">
         <item name="android:textSize">20sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:layout_marginBottom">8dp</item>
     </style>
 
-    <style name="TextView.FocusLearn.Subtitle" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/gray_600</item>
+    <!-- Підзаголовок -->
+    <style name="FocusLearnText.Subtitle">
         <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/neutral_600</item>
     </style>
 
-    <style name="TextView.FocusLearn.Body" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/gray_700</item>
+    <!-- Основний текст -->
+    <style name="FocusLearnText.Body">
         <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/neutral_700</item>
     </style>
 
-    <style name="TextView.FocusLearn.Caption" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/gray_500</item>
+    <!-- Допоміжний текст -->
+    <style name="FocusLearnText.Caption">
         <item name="android:textSize">12sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-    </style>
-
-    <!-- Button Styles -->
-    <style name="Button.FocusLearn.Primary" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/primary_400</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
-    </style>
-
-    <style name="Button.FocusLearn.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/primary_400</item>
-        <item name="android:textColor">@color/primary_600</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="Button.FocusLearn.Text" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/primary_600</item>
-        <item name="cornerRadius">8dp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
-
-    <!-- ImageView для іконок - використовуйте як звичайні атрибути -->
-    <style name="Icon.Small">
-        <item name="android:layout_width">16dp</item>
-        <item name="android:layout_height">16dp</item>
-        <item name="android:tint">@color/primary_600</item>
-    </style>
-
-    <style name="Icon.Medium">
-        <item name="android:layout_width">24dp</item>
-        <item name="android:layout_height">24dp</item>
-        <item name="android:tint">@color/primary_600</item>
-    </style>
-
-    <style name="Icon.Large">
-        <item name="android:layout_width">32dp</item>
-        <item name="android:layout_height">32dp</item>
-        <item name="android:tint">@color/primary_600</item>
-    </style>
-
-    <style name="Icon.XLarge">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:tint">@color/primary_600</item>
-    </style>
-
-    <!-- CardView Styles -->
-    <style name="Card.FocusLearn" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/white</item>
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">4dp</item>
-        <item name="android:layout_margin">8dp</item>
-    </style>
-
-    <style name="Card.FocusLearn.Interactive" parent="Card.FocusLearn">
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <!-- EditText Styles -->
-    <style name="EditText.FocusLearn" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
-        <item name="android:textColor">@color/gray_800</item>
-        <item name="android:textColorHint">@color/gray_500</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:fontFamily">sans-serif</item>
-    </style>
-
-    <!-- TextInputLayout Styles -->
-    <style name="TextInputLayout.FocusLearn" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/primary_400</item>
-        <item name="hintTextColor">@color/gray_500</item>
-        <item name="android:textColorHint">@color/gray_500</item>
-        <item name="boxCornerRadiusTopStart">8dp</item>
-        <item name="boxCornerRadiusTopEnd">8dp</item>
-        <item name="boxCornerRadiusBottomStart">8dp</item>
-        <item name="boxCornerRadiusBottomEnd">8dp</item>
-        <item name="errorTextColor">@color/danger_500</item>
-    </style>
-
-    <!-- Progress Bar -->
-    <style name="ProgressBar.FocusLearn" parent="Widget.MaterialComponents.CircularProgressIndicator">
-        <item name="indicatorColor">@color/primary_400</item>
-        <item name="trackColor">@color/gray_200</item>
-    </style>
-
-    <!-- Container/Layout Styles -->
-    <style name="Container.FocusLearn">
-        <item name="android:padding">16dp</item>
-        <item name="android:background">@color/primary_50</item>
-    </style>
-
-    <style name="Container.FocusLearn.Card">
-        <item name="android:padding">16dp</item>
-        <item name="android:background">@color/white</item>
-        <item name="android:layout_margin">8dp</item>
+        <item name="android:textColor">@color/neutral_500</item>
     </style>
 
 </resources>
