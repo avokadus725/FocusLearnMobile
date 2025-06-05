@@ -37,11 +37,19 @@ fun TimerScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Показуємо IoT повідомлення
+        uiState.iotMessage?.let { message ->
+            IoTMessageCard(
+                message = message,
+                onDismiss = { viewModel.clearIoTMessage() }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         if (timerState.isActive) {
             // Активна сесія - показуємо таймер
             ActiveTimerContent(
                 timerState = timerState,
-                onPause = viewModel::togglePause,
                 onStop = viewModel::stopSession,
                 isLoading = uiState.isLoading
             )
@@ -64,9 +72,53 @@ fun TimerScreen(
 }
 
 @Composable
+private fun IoTMessageCard(
+    message: String,
+    onDismiss: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE6F4EA) // Світло-зелений для IoT повідомлень
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.DeviceHub,
+                contentDescription = null,
+                tint = Color(0xFF2E7D32),
+                modifier = Modifier.size(20.dp)
+            )
+
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF2E7D32),
+                modifier = Modifier.weight(1f)
+            )
+
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Закрити",
+                    tint = Color(0xFF2E7D32),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ActiveTimerContent(
     timerState: com.example.focuslearnmobile.data.model.TimerState,
-    onPause: () -> Unit,
     onStop: () -> Unit,
     isLoading: Boolean
 ) {
@@ -81,27 +133,22 @@ private fun ActiveTimerContent(
         CircularTimer(
             remainingSeconds = timerState.remainingSeconds,
             totalSeconds = timerState.totalPhaseSeconds,
-            isWork = timerState.currentPhase == TimerPhase.WORK,
-            isPaused = timerState.isPaused
+            isWork = timerState.currentPhase == TimerPhase.WORK
         )
 
         // Час що залишився
         TimeDisplay(
-            remainingSeconds = timerState.remainingSeconds,
-            isPaused = timerState.isPaused
+            remainingSeconds = timerState.remainingSeconds
         )
 
         // Кнопки управління
         TimerControls(
-            isPaused = timerState.isPaused,
-            canPause = timerState.currentPhase == TimerPhase.WORK,
-            onPause = onPause,
             onStop = onStop,
             isLoading = isLoading
         )
 
-        // Попередження
-        WarningCard()
+        // IoT інформація
+        IoTInfoCard()
     }
 }
 
@@ -182,8 +229,7 @@ private fun PhaseChip(
 private fun CircularTimer(
     remainingSeconds: Int,
     totalSeconds: Int,
-    isWork: Boolean,
-    isPaused: Boolean
+    isWork: Boolean
 ) {
     val progress = if (totalSeconds > 0) {
         (totalSeconds - remainingSeconds).toFloat() / totalSeconds.toFloat()
@@ -239,11 +285,7 @@ private fun CircularTimer(
         }
 
         // Іконка в центрі
-        val icon = when {
-            isPaused -> Icons.Default.Pause
-            isWork -> Icons.Default.Work
-            else -> Icons.Default.Coffee
-        }
+        val icon = if (isWork) Icons.Default.Work else Icons.Default.Coffee
 
         Icon(
             imageVector = icon,
@@ -256,40 +298,24 @@ private fun CircularTimer(
 
 @Composable
 private fun TimeDisplay(
-    remainingSeconds: Int,
-    isPaused: Boolean
+    remainingSeconds: Int
 ) {
     val minutes = remainingSeconds / 60
     val seconds = remainingSeconds % 60
     val timeText = String.format("%02d:%02d", minutes, seconds)
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = timeText,
-            style = MaterialTheme.typography.displayLarge.copy(
-                fontSize = 56.sp,
-                fontWeight = FontWeight.Light
-            ),
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        if (isPaused) {
-            Text(
-                text = stringResource(R.string.timer_paused),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+    Text(
+        text = timeText,
+        style = MaterialTheme.typography.displayLarge.copy(
+            fontSize = 56.sp,
+            fontWeight = FontWeight.Light
+        ),
+        color = MaterialTheme.colorScheme.onSurface
+    )
 }
 
 @Composable
 private fun TimerControls(
-    isPaused: Boolean,
-    canPause: Boolean,
-    onPause: () -> Unit,
     onStop: () -> Unit,
     isLoading: Boolean
 ) {
@@ -297,25 +323,7 @@ private fun TimerControls(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Кнопка паузи (тільки для робочої фази)
-        if (canPause) {
-            FloatingActionButton(
-                onClick = { if (!isLoading) onPause() },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-            ) {
-                Icon(
-                    imageVector = if (isPaused) Icons.Default.PlayArrow else Icons.Default.Pause,
-                    contentDescription = if (isPaused) {
-                        stringResource(R.string.resume_session)
-                    } else {
-                        stringResource(R.string.pause_session)
-                    }
-                )
-            }
-        }
-
-        // Кнопка зупинки
+        // Тільки кнопка зупинки - всі інші дії через IoT
         FloatingActionButton(
             onClick = { if (!isLoading) onStop() },
             containerColor = MaterialTheme.colorScheme.errorContainer,
@@ -338,11 +346,11 @@ private fun TimerControls(
 }
 
 @Composable
-private fun WarningCard() {
+private fun IoTInfoCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF4E6)
+            containerColor = Color(0xFFE3F2FD) // Світло-синій для IoT інформації
         )
     ) {
         Row(
@@ -351,16 +359,33 @@ private fun WarningCard() {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Warning,
+                imageVector = Icons.Default.Info,
                 contentDescription = null,
-                tint = Color(0xFF8B4000),
+                tint = Color(0xFF1565C0),
                 modifier = Modifier.size(20.dp)
             )
 
-            Text(
-                text = stringResource(R.string.keep_app_open_warning),
-                style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF8B4000)
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = "IoT режим активний",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color(0xFF1565C0),
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "Дані автоматично записуються через підключений пристрій",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF1565C0)
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Default.DeviceHub,
+                contentDescription = null,
+                tint = Color(0xFF4CAF50),
+                modifier = Modifier.size(24.dp)
             )
         }
     }

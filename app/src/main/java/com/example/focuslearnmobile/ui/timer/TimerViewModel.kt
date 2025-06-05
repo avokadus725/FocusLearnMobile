@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.focuslearnmobile.data.model.TimerState
 import com.example.focuslearnmobile.data.model.TimerPhase
-import com.focuslearn.mobile.data.model.ActiveSessionDTO
 import com.focuslearn.mobile.data.model.ConcentrationMethod
 import com.focuslearn.mobile.data.repository.FocusLearnRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,12 +13,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.focuslearnmobile.data.local.IoTSettingsManager
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    val repository: FocusLearnRepository,
-    private val iotSettingsManager: IoTSettingsManager
+    val repository: FocusLearnRepository
 ) : ViewModel() {
 
     // Стан таймера
@@ -30,15 +27,8 @@ class TimerViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(TimerUiState())
     val uiState: StateFlow<TimerUiState> = _uiState.asStateFlow()
 
-    // Job для періодичного оновлення
-    private var updateJob: Job? = null
+    // Job для локального тікера (тільки для візуалізації)
     private var localTickerJob: Job? = null
-
-    val isIoTEnabled: StateFlow<Boolean> = iotSettingsManager.isIoTEnabled.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = false
-    )
 
     init {
         // Перевіряємо активну сесію при старті
@@ -49,57 +39,138 @@ class TimerViewModel @Inject constructor(
     private fun checkActiveSession() {
         viewModelScope.launch {
             try {
-                _uiState.value = _uiState.value.copy(isLoading = true)
-
                 when (val result = repository.getTimerStatus()) {
                     is FocusLearnRepository.Result.Success -> {
                         result.data?.let { session ->
-                            // Є активна сесія, оновлюємо стан і запускаємо оновлення
+                            // Є активна сесія, відновлюємо стан
+                            println("TimerViewModel: Found active session: ${session.methodTitle}")
                             updateTimerStateFromSession(session)
-                            startPeriodicUpdates()
                             startLocalTicker()
                         }
-                        _uiState.value = _uiState.value.copy(isLoading = false)
                     }
                     is FocusLearnRepository.Result.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = result.message
-                        )
+                        println("TimerViewModel: Error checking session: ${result.message}")
                     }
                     else -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        println("TimerViewModel: No active session found")
                     }
                 }
             } catch (e: Exception) {
+                println("TimerViewModel: Exception checking session: ${e.message}")
+            }
+        }
+    }
+
+    // Запуск сесії (перевіряємо активну сесію спочатку)
+    fun startSession(method: ConcentrationMethod) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
+                println("TimerViewModel: Starting session with method: ${method.title}, ID: ${method.methodId}")
+
+                // Спочатку перевіряємо чи немає активної сесії
+                when (val statusResult = repository.getTimerStatus()) {
+                    is FocusLearnRepository.Result.Success -> {
+                        if (statusResult.data != null) {
+                            // Вже є активна сесія - відновлюємо її
+                            println("TimerViewModel: Active session found, restoring...")
+                            updateTimerStateFromSession(statusResult.data)
+                            startLocalTicker()
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                iotMessage = "Відновлено активну сесію: ${statusResult.data.methodTitle}"
+                            )
+                            return@launch
+                        }
+                    }
+                    is FocusLearnRepository.Result.Error -> {
+                        // Помилка перевірки - спробуємо створити нову
+                        println("TimerViewModel: Error checking status: ${statusResult.message}")
+                    }
+                    else -> {
+                        println("TimerViewModel: No active session, creating new one...")
+                    }
+                }
+
+                // Немає активної сесії - створюємо нову
+                when (val result = repository.startTimerSession(method.methodId)) {
+                    is FocusLearnRepository.Result.Success -> {
+                        println("TimerViewModel: Session started successfully")
+
+                        // Сесія успішно створена на сервері, IoT отримав сигнал
+                        val workDurationSeconds = method.workDuration * 60
+
+                        _timerState.value = TimerState(
+                            isActive = true,
+                            isPaused = false,
+                            currentPhase = TimerPhase.WORK,
+                            methodTitle = method.title,
+                            remainingSeconds = workDurationSeconds,
+                            totalPhaseSeconds = workDurationSeconds,
+                            currentCycle = 1,
+                            isLoading = false,
+                            error = null
+                        )
+
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            selectedMethod = method,
+                            iotMessage = "Сесію розпочато! IoT пристрій отримав сигнал і розпочав запис даних."
+                        )
+
+                        startLocalTicker()
+                    }
+                    is FocusLearnRepository.Result.Error -> {
+                        println("TimerViewModel: Session start failed: ${result.message}")
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Не вдалося розпочати сесію: ${result.message}"
+                        )
+                    }
+                    else -> {
+                        println("TimerViewModel: Session start unknown result")
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Помилка запуску сесії"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                println("TimerViewModel: Exception in startSession: ${e.message}")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "Error checking session: ${e.localizedMessage}"
+                    error = "Помилка: ${e.message}"
                 )
             }
         }
     }
 
-    // Запуск сесії з обраною методикою
-    fun startSession(method: ConcentrationMethod) {
+    // Зупинка сесії (повідомляємо сервер про завершення)
+    fun stopSession() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            _uiState.value = _uiState.value.copy(isLoading = true)
 
-            when (val result = repository.startTimerSession(method.methodId)) {
+            // Повідомляємо сервер про зупинку, щоб IoT також зупинився
+            when (val result = repository.stopTimerSession()) {
                 is FocusLearnRepository.Result.Success -> {
-                    updateTimerStateFromSession(result.data)
+                    _timerState.value = TimerState()
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        selectedMethod = method
+                        selectedMethod = null,
+                        iotMessage = "Сесію зупинено. IoT пристрій отримав сигнал і завершив запис."
                     )
-                    startPeriodicUpdates()
-                    startLocalTicker()
+                    stopLocalTicker()
                 }
                 is FocusLearnRepository.Result.Error -> {
+                    // Навіть при помилці API, зупиняємо локально
+                    _timerState.value = TimerState()
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = result.message
+                        selectedMethod = null,
+                        iotMessage = "Сесію зупинено локально. Можливі проблеми з IoT зв'язком."
                     )
+                    stopLocalTicker()
                 }
                 else -> {
                     _uiState.value = _uiState.value.copy(isLoading = false)
@@ -108,203 +179,74 @@ class TimerViewModel @Inject constructor(
         }
     }
 
-    // Пауза/відновлення сесії
-    fun togglePause() {
-        viewModelScope.launch {
-            when (val result = repository.pauseTimerSession()) {
-                is FocusLearnRepository.Result.Success -> {
-                    updateTimerStateFromSession(result.data)
-                    if (result.data.isPaused) {
-                        stopLocalTicker()
-                    } else {
-                        startLocalTicker()
-                    }
-                }
-                is FocusLearnRepository.Result.Error -> {
-                    _uiState.value = _uiState.value.copy(error = result.message)
-                }
-                else -> {}
+    // Автоматичне перемикання фаз для візуалізації (тільки Work → Break → Завершення)
+    private fun switchToNextPhase() {
+        val currentState = _timerState.value
+        val currentMethod = _uiState.value.selectedMethod ?: return
+
+        if (currentState.currentPhase == TimerPhase.WORK) {
+            // Робоча фаза закінчилась → починається перерва
+            val breakDurationSeconds = currentMethod.breakDuration * 60
+
+            _timerState.value = currentState.copy(
+                currentPhase = TimerPhase.BREAK,
+                remainingSeconds = breakDurationSeconds,
+                totalPhaseSeconds = breakDurationSeconds
+            )
+
+            _uiState.value = _uiState.value.copy(
+                iotMessage = "Робочу фазу завершено! Починається перерва."
+            )
+        } else {
+            // Перерва закінчилась → сесія завершена
+            _timerState.value = TimerState()
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                selectedMethod = null,
+                iotMessage = "Сесію повністю завершено! Робота + перерва виконані."
+            )
+            stopLocalTicker()
+
+            // Також повідомляємо сервер про завершення
+            viewModelScope.launch {
+                repository.stopTimerSession()
             }
         }
     }
 
-    // Зупинка сесії
-    fun stopSession() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            val iotEnabled = iotSettingsManager.isIoTCurrentlyEnabled()
-
-            if (iotEnabled) {
-                // Якщо IoT увімкнений - просто скидаємо локальний стан
-                _timerState.value = TimerState()
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    selectedMethod = null,
-                    iotMessage = "Сесію зупинено локально. IoT пристрій продовжує запис автоматично."
-                )
-                stopPeriodicUpdates()
-                stopLocalTicker()
-            } else {
-                // Якщо IoT вимкнений - зупиняємо через API
-                when (val result = repository.stopTimerSession()) {
-                    is FocusLearnRepository.Result.Success -> {
-                        _timerState.value = TimerState()
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            selectedMethod = null
-                        )
-                        stopPeriodicUpdates()
-                        stopLocalTicker()
-                    }
-                    is FocusLearnRepository.Result.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = result.message
-                        )
-                    }
-                    else -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                    }
-                }
-            }
-        }
-    }
+    // Очистка повідомлень
     fun clearIoTMessage() {
         _uiState.value = _uiState.value.copy(iotMessage = null)
     }
 
-    // Завершення поточної фази
-    fun completeCurrentPhase() {
-        viewModelScope.launch {
-            val iotEnabled = iotSettingsManager.isIoTCurrentlyEnabled()
-
-            if (iotEnabled) {
-                // Якщо IoT увімкнений - тільки оновлюємо UI, не записуємо в БД
-                completePhaseUIOnly()
-            } else {
-                // Якщо IoT вимкнений - записуємо через API як зазвичай
-                completePhaseWithAPI()
-            }
-        }
-    }
-
-    private suspend fun completePhaseUIOnly() {
-        val currentState = _timerState.value
-
-        // Переключаємо фазу локально
-        val newPhase = if (currentState.currentPhase == TimerPhase.WORK) {
-            TimerPhase.BREAK
-        } else {
-            TimerPhase.WORK
-        }
-
-        // Оновлюємо стан без API виклику
-        _timerState.value = currentState.copy(
-            currentPhase = newPhase,
-            remainingSeconds = if (newPhase == TimerPhase.WORK) {
-                currentState.totalPhaseSeconds // Повертаємося до робочого часу
-            } else {
-                // Час перерви (можна додати логіку отримання з методики)
-                300 // 5 хвилин за замовчуванням
-            },
-            currentCycle = if (newPhase == TimerPhase.WORK) {
-                currentState.currentCycle + 1
-            } else {
-                currentState.currentCycle
-            }
-        )
-
-        // Показуємо повідомлення користувачу
-        _uiState.value = _uiState.value.copy(
-            iotMessage = if (newPhase == TimerPhase.BREAK) {
-                "Фазу роботи завершено! Дані автоматично записані через IoT пристрій."
-            } else {
-                "Перерва завершена! Почніть нову робочу фазу."
-            }
-        )
-    }
-
-    private suspend fun completePhaseWithAPI() {
-        when (val result = repository.completeCurrentPhase()) {
-            is FocusLearnRepository.Result.Success -> {
-                updateTimerStateFromSession(result.data)
-            }
-            is FocusLearnRepository.Result.Error -> {
-                _uiState.value = _uiState.value.copy(error = result.message)
-            }
-            else -> {}
-        }
-    }
-
-    // Очистка помилки
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
 
-    // Оновлення локального стану з серверної сесії
-    private fun updateTimerStateFromSession(session: ActiveSessionDTO) {
-        val phase = when (session.currentPhase?.lowercase()) {
-            "work" -> TimerPhase.WORK
-            "break" -> TimerPhase.BREAK
-            else -> TimerPhase.WORK // За замовчуванням Work, якщо currentPhase null або невідомий
-        }
-
-        _timerState.value = TimerState(
-            isActive = session.isActive,
-            isPaused = session.isPaused,
-            currentPhase = phase,
-            methodTitle = session.methodTitle.ifEmpty { "Unknown Method" }, // Захист від пустої назви
-            remainingSeconds = session.remainingSeconds,
-            totalPhaseSeconds = session.phaseDurationMinutes * 60,
-            currentCycle = session.currentCycle,
-            isLoading = false,
-            error = null
-        )
-    }
-
-    // Періодичне оновлення з сервера (кожні 30 секунд)
-    private fun startPeriodicUpdates() {
-        updateJob?.cancel()
-        updateJob = viewModelScope.launch {
-            while (true) {
-                delay(30_000) // 30 секунд
-                if (timerState.value.isActive) {
-                    repository.getTimerStatus()
-                } else {
-                    break
-                }
-            }
-        }
-    }
-
-    // Локальний тікер для плавного відображення (кожну секунду)
+    // Локальний тікер для візуалізації (кожну секунду)
     private fun startLocalTicker() {
         localTickerJob?.cancel()
         localTickerJob = viewModelScope.launch {
             while (true) {
                 delay(1_000) // 1 секунда
                 val currentState = timerState.value
-                if (currentState.isActive && !currentState.isPaused) {
+
+                if (currentState.isActive) {
+                    val newRemainingSeconds = maxOf(0, currentState.remainingSeconds - 1)
+
                     _timerState.value = currentState.copy(
-                        remainingSeconds = maxOf(0, currentState.remainingSeconds - 1)
+                        remainingSeconds = newRemainingSeconds
                     )
 
-                    // Перевіряємо чи час не закінчився
-                    if (currentState.remainingSeconds <= 1) {
-                        // Час фази закінчився, завершуємо автоматично
-                        completeCurrentPhase()
+                    // Коли час закінчується, автоматично переключаємо фазу для візуалізації
+                    if (newRemainingSeconds <= 0) {
+                        switchToNextPhase()
                     }
                 } else {
                     break
                 }
             }
         }
-    }
-
-    private fun stopPeriodicUpdates() {
-        updateJob?.cancel()
-        updateJob = null
     }
 
     private fun stopLocalTicker() {
@@ -312,9 +254,49 @@ class TimerViewModel @Inject constructor(
         localTickerJob = null
     }
 
+    // Оновлення локального стану з серверної сесії
+    private fun updateTimerStateFromSession(session: com.focuslearn.mobile.data.model.ActiveSessionDTO) {
+        val phase = when (session.currentPhase?.lowercase()) {
+            "work" -> TimerPhase.WORK
+            "break" -> TimerPhase.BREAK
+            else -> TimerPhase.WORK
+        }
+
+        // Знаходимо методику для отримання повної інформації
+        val selectedMethod = _uiState.value.selectedMethod
+
+        _timerState.value = TimerState(
+            isActive = session.isActive,
+            isPaused = session.isPaused,
+            currentPhase = phase,
+            methodTitle = session.methodTitle.ifEmpty { "Unknown Method" },
+            remainingSeconds = session.remainingSeconds,
+            totalPhaseSeconds = session.phaseDurationMinutes * 60,
+            currentCycle = session.currentCycle,
+            isLoading = false,
+            error = null
+        )
+
+        // Зберігаємо інформацію про методику для UI
+        if (selectedMethod == null) {
+            // Спробуємо створити об'єкт методики з даних сесії
+            val reconstructedMethod = com.focuslearn.mobile.data.model.ConcentrationMethod(
+                methodId = session.methodId,
+                title = session.methodTitle,
+                description = null,
+                workDuration = session.workDurationMinutes,
+                breakDuration = session.breakDurationMinutes,
+                createdAt = null
+            )
+
+            _uiState.value = _uiState.value.copy(
+                selectedMethod = reconstructedMethod
+            )
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
-        stopPeriodicUpdates()
         stopLocalTicker()
     }
 }

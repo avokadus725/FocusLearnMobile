@@ -3,6 +3,7 @@ package com.focuslearn.mobile.data.repository
 import com.focuslearn.mobile.data.api.FocusLearnApi
 import com.focuslearn.mobile.data.model.*
 import com.example.focuslearnmobile.data.local.TokenStorage
+import com.example.focuslearnmobile.data.model.StartSessionRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
@@ -19,7 +20,6 @@ class FocusLearnRepository @Inject constructor(
     sealed class Result<T> {
         data class Success<T>(val data: T) : Result<T>()
         data class Error<T>(val message: String) : Result<T>()
-        data class Loading<T>(val isLoading: Boolean) : Result<T>()
     }
 
     // Приватний метод для отримання токена з Bearer префіксом
@@ -61,39 +61,6 @@ class FocusLearnRepository @Inject constructor(
                 Result.Success(Unit)
             } else {
                 Result.Error("Failed to update profile: ${response.code()}")
-            }
-        } catch (e: Exception) {
-            Result.Error("Network error: ${e.localizedMessage}")
-        }
-    }
-
-    suspend fun getAllUsers(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
-        try {
-            val authToken = getAuthToken()
-                ?: return@withContext Result.Error<List<UserDTO>>("No authentication token")
-
-            val response = api.getAllUsers(authToken)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.Success(it)
-                } ?: Result.Error("Empty response")
-            } else {
-                Result.Error("Server error: ${response.code()}")
-            }
-        } catch (e: Exception) {
-            Result.Error("Network error: ${e.localizedMessage}")
-        }
-    }
-
-    suspend fun getAllTutors(): Result<List<UserDTO>> = withContext(Dispatchers.IO) {
-        try {
-            val response = api.getAllTutors()
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.Success(it)
-                } ?: Result.Error("Empty response")
-            } else {
-                Result.Error("Server error: ${response.code()}")
             }
         } catch (e: Exception) {
             Result.Error("Network error: ${e.localizedMessage}")
@@ -145,7 +112,7 @@ class FocusLearnRepository @Inject constructor(
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<ActiveSessionDTO>("No authentication token")
 
-            val request = com.example.focuslearnmobile.data.model.StartSessionRequest(methodId)
+            val request = StartSessionRequest(methodId)
             val response = api.startSession(authToken, request)
 
             if (response.isSuccessful) {
@@ -263,6 +230,7 @@ class FocusLearnRepository @Inject constructor(
             Result.Error("Network error: ${e.localizedMessage}")
         }
     }
+
     // === ЗАВДАННЯ ===
     suspend fun getAvailableAssignments(): Result<List<AssignmentDTO>> = withContext(Dispatchers.IO) {
         try {
@@ -464,15 +432,29 @@ class FocusLearnRepository @Inject constructor(
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<UserStatisticsDTO>("No authentication token")
 
+            println("Repository: Getting user statistics for $periodStartDate, $periodType")
             val response = api.getUserStatistics(authToken, periodStartDate, periodType)
+
             if (response.isSuccessful) {
-                response.body()?.let {
-                    Result.Success(it)
-                } ?: Result.Error("Empty response")
+                response.body()?.let { apiResponse ->
+                    println("Repository: API Response: $apiResponse")
+                    if (apiResponse.success && apiResponse.data != null) {
+                        println("Repository: Statistics data: ${apiResponse.data}")
+                        Result.Success(apiResponse.data)
+                    } else {
+                        println("Repository: API success=false or data=null: ${apiResponse.message}")
+                        Result.Error(apiResponse.message ?: "Failed to get statistics")
+                    }
+                } ?: run {
+                    println("Repository: Empty response body")
+                    Result.Error("Empty response")
+                }
             } else {
+                println("Repository: HTTP error: ${response.code()}")
                 Result.Error("Server error: ${response.code()}")
             }
         } catch (e: Exception) {
+            println("Repository: Exception: ${e.message}")
             Result.Error("Network error: ${e.localizedMessage}")
         }
     }
@@ -482,9 +464,12 @@ class FocusLearnRepository @Inject constructor(
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<ProductivityCoefficientResponse>("No authentication token")
 
+            println("Repository: Getting productivity coefficient")
             val response = api.getProductivityCoefficient(authToken, periodStartDate, periodType)
+
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
+                    println("Repository: Productivity response: $apiResponse")
                     if (apiResponse.success && apiResponse.data != null) {
                         Result.Success(apiResponse.data)
                     } else {
@@ -504,9 +489,12 @@ class FocusLearnRepository @Inject constructor(
             val authToken = getAuthToken()
                 ?: return@withContext Result.Error<MostEffectiveMethodResponse>("No authentication token")
 
+            println("Repository: Getting most effective method")
             val response = api.getMostEffectiveMethod(authToken, periodStartDate, periodType)
+
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
+                    println("Repository: Method response: $apiResponse")
                     if (apiResponse.success && apiResponse.data != null) {
                         Result.Success(apiResponse.data)
                     } else {

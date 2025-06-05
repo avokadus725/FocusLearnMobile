@@ -143,11 +143,6 @@ data class UserStatisticsDTO(
 )
 
 // Запити
-data class StartSessionRequest(
-    @SerializedName("methodId")
-    val methodId: Int
-)
-
 data class SubmitAssignmentRequest(
     @SerializedName("fileLink")
     val fileLink: String

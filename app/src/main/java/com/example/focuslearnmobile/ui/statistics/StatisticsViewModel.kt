@@ -1,6 +1,8 @@
 // app/src/main/java/com/example/focuslearnmobile/ui/statistics/StatisticsViewModel.kt
 package com.example.focuslearnmobile.ui.statistics
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.focuslearn.mobile.data.model.UserStatisticsDTO
@@ -22,6 +24,7 @@ class StatisticsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(StatisticsUiState())
     val uiState: StateFlow<StatisticsUiState> = _uiState.asStateFlow()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadStatistics(period: StatisticsPeriod) {
         viewModelScope.launch {
             try {
@@ -29,8 +32,12 @@ class StatisticsViewModel @Inject constructor(
 
                 val (startDate, periodType) = getPeriodParameters(period)
 
+                println("StatisticsViewModel: Loading stats for period $startDate, type $periodType")
+
                 // Завантажуємо основну статистику
                 val statisticsResult = repository.getUserStatistics(startDate, periodType)
+
+                println("StatisticsViewModel: Statistics result type: ${statisticsResult::class.simpleName}")
 
                 // Завантажуємо коефіцієнт продуктивності
                 val productivityResult = repository.getProductivityCoefficient(startDate, periodType)
@@ -40,13 +47,29 @@ class StatisticsViewModel @Inject constructor(
 
                 when (statisticsResult) {
                     is FocusLearnRepository.Result.Success -> {
+                        println("StatisticsViewModel: Statistics loaded successfully: ${statisticsResult.data}")
+
                         val productivity = when (productivityResult) {
-                            is FocusLearnRepository.Result.Success -> productivityResult.data.productivityCoefficient
+                            is FocusLearnRepository.Result.Success -> {
+                                println("StatisticsViewModel: Productivity: ${productivityResult.data.productivityCoefficient}")
+                                productivityResult.data.productivityCoefficient
+                            }
+                            is FocusLearnRepository.Result.Error -> {
+                                println("StatisticsViewModel: Productivity error: ${productivityResult.message}")
+                                0.0
+                            }
                             else -> 0.0
                         }
 
                         val effectiveMethod = when (methodResult) {
-                            is FocusLearnRepository.Result.Success -> methodResult.data.message
+                            is FocusLearnRepository.Result.Success -> {
+                                println("StatisticsViewModel: Method: ${methodResult.data.message}")
+                                methodResult.data.message
+                            }
+                            is FocusLearnRepository.Result.Error -> {
+                                println("StatisticsViewModel: Method error: ${methodResult.message}")
+                                ""
+                            }
                             else -> ""
                         }
 
@@ -60,6 +83,7 @@ class StatisticsViewModel @Inject constructor(
                     }
 
                     is FocusLearnRepository.Result.Error -> {
+                        println("StatisticsViewModel: Statistics error: ${statisticsResult.message}")
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             error = statisticsResult.message
@@ -67,6 +91,7 @@ class StatisticsViewModel @Inject constructor(
                     }
 
                     else -> {
+                        println("StatisticsViewModel: Unknown statistics result")
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             error = "Unknown error loading statistics"
@@ -75,6 +100,7 @@ class StatisticsViewModel @Inject constructor(
                 }
 
             } catch (e: Exception) {
+                println("StatisticsViewModel: Exception: ${e.message}")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     error = "Error loading statistics: ${e.localizedMessage}"
@@ -83,25 +109,22 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getPeriodParameters(period: StatisticsPeriod): Pair<String, String> {
         val today = LocalDate.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
         return when (period) {
             StatisticsPeriod.DAILY -> {
-                today.format(formatter) to "Day"
+                today.format(formatter) to "Day"  // Сьогоднішня дата
             }
             StatisticsPeriod.WEEKLY -> {
-                today.minusDays(6).format(formatter) to "Week"
+                today.minusDays(6).format(formatter) to "Week"  // Початок тижня
             }
             StatisticsPeriod.MONTHLY -> {
-                today.minusDays(29).format(formatter) to "Month"
+                today.minusDays(29).format(formatter) to "Month"  // Початок місяця
             }
         }
-    }
-
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
     }
 }
 

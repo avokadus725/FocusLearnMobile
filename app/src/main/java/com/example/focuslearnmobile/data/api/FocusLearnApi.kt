@@ -92,12 +92,13 @@ interface FocusLearnApi {
     suspend fun getMaterialById(@Path("id") materialId: Int): Response<ApiResponse<LearningMaterialDTO>>
 
     // === СТАТИСТИКА ===
+    // Цей метод повертає ApiResponse
     @GET("businesslogic/user-statistics")
     suspend fun getUserStatistics(
         @Header("Authorization") token: String,
         @Query("periodStartDate") periodStartDate: String,
         @Query("periodType") periodType: String
-    ): Response<UserStatisticsDTO>
+    ): Response<ApiResponse<UserStatisticsDTO>>
 
     @GET("businesslogic/productivity-coefficient")
     suspend fun getProductivityCoefficient(
