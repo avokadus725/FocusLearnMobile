@@ -56,18 +56,22 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.material:material:1.9.0")
     // Core Android
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
 
-    // Compose
+    // Compose BOM - використовуємо стабільну версію
     implementation(platform("androidx.compose:compose-bom:2024.02.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
+
+    // Material Design 3 для Compose
     implementation("androidx.compose.material3:material3")
+
+    // Material Design для Views (якщо потрібно)
+    implementation("com.google.android.material:material:1.11.0")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.6")
@@ -88,15 +92,7 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-
+    // DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Google Sign-In
@@ -106,31 +102,27 @@ dependencies {
     implementation ("com.facebook.android:facebook-login:16.2.0")
     implementation ("com.facebook.android:facebook-core:16.2.0")
 
-    // Корутини
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-    // Hilt
-    implementation ("com.google.dagger:hilt-android:2.48")
-    kapt ("com.google.dagger:hilt-compiler:2.48")
-
-    // Retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-
+    // Compose Runtime LiveData
     implementation("androidx.compose.runtime:runtime-livedata")
-
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.6")
 
     // Compose animations
     implementation("androidx.compose.animation:animation:1.5.8")
 
-    // Hilt Navigation Compose
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
     // Для роботи з датами (LocalDate)
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
+    // Material Icons
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Testing
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }

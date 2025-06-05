@@ -99,4 +99,32 @@
     <!-- Settings -->
     <string name="appearance">Appearance</string>
     <string name="preferences">Preferences</string>
+
+    <!-- Profile Screen -->
+    <string name="edit_profile">Edit Profile</string>
+    <string name="profile_information">Profile Information</string>
+    <string name="user_id">User ID</string>
+    <string name="user_name">Name</string>
+    <string name="email">Email</string>
+    <string name="role">Role</string>
+    <string name="status">Status</string>
+    <string name="loading_profile">Loading profile…</string>
+    <string name="no_profile_data">No profile data available</string>
+    <string name="refresh_profile">Refresh Profile</string>
+    <string name="actions">Actions</string>
+    <string name="success">Success</string>
+    <string name="error">Error</string>
+
+    <!-- Edit Profile -->
+    <string name="profile_photo_url">Profile Photo URL</string>
+    <string name="save">Save</string>
+    <string name="edit_profile_note">Only name and photo can be changed. Email change requires administrator access.</string>
+
+    <!-- User roles and statuses -->
+    <string name="student">Student</string>
+    <string name="tutor">Tutor</string>
+    <string name="admin">Administrator</string>
+    <string name="active">Active</string>
+    <string name="inactive">Inactive</string>
+    <string name="pending">Pending</string>
 </resources>

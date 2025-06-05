@@ -1,6 +1,9 @@
-// app/src/main/java/com/example/focuslearnmobile/ui/navigation/Navigation.kt
+// Оновіть app/src/main/java/com/example/focuslearnmobile/ui/navigation/Navigation.kt
+
 package com.example.focuslearnmobile.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -18,10 +21,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.focuslearnmobile.R
+import com.example.focuslearnmobile.ui.components.LanguageSwitcherButton
 import com.example.focuslearnmobile.ui.statistics.StatisticsScreen
 import com.example.focuslearnmobile.ui.timer.TimerScreen
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Schedule
+import com.example.focuslearnmobile.ui.profile.ProfileScreen
 
 sealed class NavigationItem(
     val route: String,
@@ -29,19 +32,21 @@ sealed class NavigationItem(
     val titleRes: Int
 ) {
     object Timer : NavigationItem("timer", Icons.Default.Schedule, R.string.timer)
-    object Methods : NavigationItem("methods", Icons.AutoMirrored.Filled.List, R.string.methods)
+    object Profile : NavigationItem("profile", Icons.Default.Person, R.string.profile)
     object Statistics : NavigationItem("statistics", Icons.Default.BarChart, R.string.stats)
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigationScreen(
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onLanguageChanged: (() -> Unit)? = null
 ) {
     val navController = rememberNavController()
     val navigationItems = listOf(
         NavigationItem.Timer,
-        NavigationItem.Methods,
+        NavigationItem.Profile,
         NavigationItem.Statistics
     )
 
@@ -50,6 +55,10 @@ fun MainNavigationScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
                 actions = {
+                    // Кнопка переключення мови
+                    LanguageSwitcherButton(onLanguageChanged = onLanguageChanged)
+
+                    // Кнопка виходу
                     IconButton(onClick = onLogout) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
@@ -92,35 +101,13 @@ fun MainNavigationScreen(
                 TimerScreen()
             }
 
-            composable(NavigationItem.Methods.route) {
-                MethodsScreen()
+            composable(NavigationItem.Profile.route) {
+                ProfileScreen()
             }
 
             composable(NavigationItem.Statistics.route) {
                 StatisticsScreen()
             }
         }
-    }
-}
-
-@Composable
-private fun MethodsScreen() {
-    // Простий екран зі списком методик (без таймера)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.methods),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Text(
-            text = "Тут буде список всіх доступних методик концентрації для перегляду",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

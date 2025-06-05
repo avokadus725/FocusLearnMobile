@@ -96,4 +96,32 @@
     <!-- Settings -->
     <string name="appearance">Зовнішній вигляд</string>
     <string name="preferences">Налаштування</string>
+
+    <!-- Profile Screen -->
+    <string name="edit_profile">Редагувати профіль</string>
+    <string name="profile_information">Інформація профілю</string>
+    <string name="user_id">ID користувача</string>
+    <string name="user_name">Ім\'я</string>
+    <string name="email">Електронна пошта</string>
+    <string name="role">Роль</string>
+    <string name="status">Статус</string>
+    <string name="loading_profile">Завантаження профілю…</string>
+    <string name="no_profile_data">Дані профілю недоступні</string>
+    <string name="refresh_profile">Оновити профіль</string>
+    <string name="actions">Дії</string>
+    <string name="success">Успіх</string>
+    <string name="error">Помилка</string>
+
+    <!-- Edit Profile -->
+    <string name="profile_photo_url">URL фото профілю</string>
+    <string name="save">Зберегти</string>
+    <string name="edit_profile_note">Можна змінити тільки ім\'я та фото. Зміна email потребує доступу адміністратора.</string>
+
+    <!-- User roles and statuses -->
+    <string name="student">Студент</string>
+    <string name="tutor">Викладач</string>
+    <string name="admin">Адміністратор</string>
+    <string name="active">Активний</string>
+    <string name="inactive">Неактивний</string>
+    <string name="pending">Очікує</string>
 </resources>

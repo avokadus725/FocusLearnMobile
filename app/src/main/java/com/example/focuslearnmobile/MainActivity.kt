@@ -1,14 +1,18 @@
+// Оновіть app/src/main/java/com/example/focuslearnmobile/MainActivity.kt
+
 package com.example.focuslearnmobile
 
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import com.example.focuslearnmobile.R
 import com.example.focuslearnmobile.data.local.LanguageManager
 import com.example.focuslearnmobile.ui.auth.AuthScreen
@@ -39,29 +44,55 @@ class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
 
+    @Inject
+    lateinit var languageManager: LanguageManager
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Застосовуємо збережену мову при старті
+        lifecycleScope.launch {
+            val savedLanguage = languageManager.getCurrentLanguage()
+            languageManager.applyLanguageToActivity(this@MainActivity, savedLanguage)
+        }
+
         setContent {
             FocusLearnMobileTheme {
                 MainApp(
                     authViewModel = authViewModel,
-                    mainViewModel = mainViewModel
+                    mainViewModel = mainViewModel,
+                    onLanguageChanged = {
+                        // Перезапускаємо Activity для застосування мови
+                        recreate()
+                    }
                 )
             }
         }
     }
+
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase)
+        // Застосовуємо мову до базового контексту
+        newBase?.let { context ->
+            // Тут можна застосувати збережену мову, якщо потрібно
+        }
+    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainApp(
     authViewModel: AuthViewModel,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    onLanguageChanged: () -> Unit = {}
 ) {
     val authState by authViewModel.authState.collectAsState()
 
     if (authState.isAuthenticated) {
         MainNavigationScreen(
-            onLogout = { authViewModel.logout() }
+            onLogout = { authViewModel.logout() },
+            onLanguageChanged = onLanguageChanged
         )
     } else {
         AuthScreen(
@@ -94,7 +125,7 @@ fun MainScreen(
                     IconButton(
                         onClick = { showLanguageDialog = true }
                     ) {
-
+                        // Тут може бути іконка мови
                     }
 
                     // Logout button

@@ -14,10 +14,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.focuslearnmobile.data.local.IoTSettingsManager
 
 @HiltViewModel
 class TimerViewModel @Inject constructor(
-    val repository: FocusLearnRepository // Зробили публічним для доступу з MethodSelectionScreen
+    val repository: FocusLearnRepository,
+    private val iotSettingsManager: IoTSettingsManager
 ) : ViewModel() {
 
     // Стан таймера
@@ -31,6 +33,12 @@ class TimerViewModel @Inject constructor(
     // Job для періодичного оновлення
     private var updateJob: Job? = null
     private var localTickerJob: Job? = null
+
+    val isIoTEnabled: StateFlow<Boolean> = iotSettingsManager.isIoTEnabled.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
 
     init {
         // Перевіряємо активну сесію при старті
@@ -125,41 +133,107 @@ class TimerViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            when (val result = repository.stopTimerSession()) {
-                is FocusLearnRepository.Result.Success -> {
-                    _timerState.value = TimerState()
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        selectedMethod = null
-                    )
-                    stopPeriodicUpdates()
-                    stopLocalTicker()
-                }
-                is FocusLearnRepository.Result.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = result.message
-                    )
-                }
-                else -> {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
+            val iotEnabled = iotSettingsManager.isIoTCurrentlyEnabled()
+
+            if (iotEnabled) {
+                // Якщо IoT увімкнений - просто скидаємо локальний стан
+                _timerState.value = TimerState()
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    selectedMethod = null,
+                    iotMessage = "Сесію зупинено локально. IoT пристрій продовжує запис автоматично."
+                )
+                stopPeriodicUpdates()
+                stopLocalTicker()
+            } else {
+                // Якщо IoT вимкнений - зупиняємо через API
+                when (val result = repository.stopTimerSession()) {
+                    is FocusLearnRepository.Result.Success -> {
+                        _timerState.value = TimerState()
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            selectedMethod = null
+                        )
+                        stopPeriodicUpdates()
+                        stopLocalTicker()
+                    }
+                    is FocusLearnRepository.Result.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.message
+                        )
+                    }
+                    else -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                    }
                 }
             }
         }
+    }
+    fun clearIoTMessage() {
+        _uiState.value = _uiState.value.copy(iotMessage = null)
     }
 
     // Завершення поточної фази
     fun completeCurrentPhase() {
         viewModelScope.launch {
-            when (val result = repository.completeCurrentPhase()) {
-                is FocusLearnRepository.Result.Success -> {
-                    updateTimerStateFromSession(result.data)
-                }
-                is FocusLearnRepository.Result.Error -> {
-                    _uiState.value = _uiState.value.copy(error = result.message)
-                }
-                else -> {}
+            val iotEnabled = iotSettingsManager.isIoTCurrentlyEnabled()
+
+            if (iotEnabled) {
+                // Якщо IoT увімкнений - тільки оновлюємо UI, не записуємо в БД
+                completePhaseUIOnly()
+            } else {
+                // Якщо IoT вимкнений - записуємо через API як зазвичай
+                completePhaseWithAPI()
             }
+        }
+    }
+
+    private suspend fun completePhaseUIOnly() {
+        val currentState = _timerState.value
+
+        // Переключаємо фазу локально
+        val newPhase = if (currentState.currentPhase == TimerPhase.WORK) {
+            TimerPhase.BREAK
+        } else {
+            TimerPhase.WORK
+        }
+
+        // Оновлюємо стан без API виклику
+        _timerState.value = currentState.copy(
+            currentPhase = newPhase,
+            remainingSeconds = if (newPhase == TimerPhase.WORK) {
+                currentState.totalPhaseSeconds // Повертаємося до робочого часу
+            } else {
+                // Час перерви (можна додати логіку отримання з методики)
+                300 // 5 хвилин за замовчуванням
+            },
+            currentCycle = if (newPhase == TimerPhase.WORK) {
+                currentState.currentCycle + 1
+            } else {
+                currentState.currentCycle
+            }
+        )
+
+        // Показуємо повідомлення користувачу
+        _uiState.value = _uiState.value.copy(
+            iotMessage = if (newPhase == TimerPhase.BREAK) {
+                "Фазу роботи завершено! Дані автоматично записані через IoT пристрій."
+            } else {
+                "Перерва завершена! Почніть нову робочу фазу."
+            }
+        )
+    }
+
+    private suspend fun completePhaseWithAPI() {
+        when (val result = repository.completeCurrentPhase()) {
+            is FocusLearnRepository.Result.Success -> {
+                updateTimerStateFromSession(result.data)
+            }
+            is FocusLearnRepository.Result.Error -> {
+                _uiState.value = _uiState.value.copy(error = result.message)
+            }
+            else -> {}
         }
     }
 
@@ -248,5 +322,6 @@ class TimerViewModel @Inject constructor(
 data class TimerUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val selectedMethod: ConcentrationMethod? = null
+    val selectedMethod: ConcentrationMethod? = null,
+    val iotMessage: String? = null
 )
