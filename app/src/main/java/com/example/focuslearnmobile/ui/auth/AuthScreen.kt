@@ -49,17 +49,14 @@ fun AuthScreen(
         }
     }
 
-    // Слідкуємо за станом авторизації
     LaunchedEffect(authState.isAuthenticated) {
         if (authState.isAuthenticated) {
             onAuthSuccess()
         }
     }
 
-    // Показуємо помилки
     authState.error?.let { error ->
         LaunchedEffect(error) {
-            // Тут можна показати Snackbar або Toast
         }
     }
 
@@ -71,7 +68,7 @@ fun AuthScreen(
         verticalArrangement = Arrangement.Center
     ) {
 
-        // Логотип або назва додатку
+        // Назва додатку
         Text(
             text = "FocusLearn",
             fontSize = 32.sp,

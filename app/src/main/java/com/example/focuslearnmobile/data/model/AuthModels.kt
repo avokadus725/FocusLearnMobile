@@ -3,7 +3,7 @@ package com.example.focuslearnmobile.data.model
 import com.focuslearn.mobile.data.model.UserDTO
 import com.google.gson.annotations.SerializedName
 
-// Запит для прямої автентифікації (замість редиректів)
+// Запит для прямої автентифікації
 data class DirectAuthRequest(
     @SerializedName("provider")
     val provider: String, // "Google" або "Facebook"

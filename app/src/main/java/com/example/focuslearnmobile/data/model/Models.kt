@@ -48,36 +48,6 @@ data class ConcentrationMethod(
     val createdAt: String?
 )
 
-// Завдання
-data class AssignmentDTO(
-    @SerializedName("assignmentId")
-    val assignmentId: Int?,
-    @SerializedName("title")
-    val title: String,
-    @SerializedName("description")
-    val description: String?,
-    @SerializedName("fileLink")
-    val fileLink: String?,
-    @SerializedName("studentId")
-    val studentId: Int?,
-    @SerializedName("tutorId")
-    val tutorId: Int,
-    @SerializedName("taskId")
-    val taskId: Int?,
-    @SerializedName("status")
-    val status: String?,
-    @SerializedName("dueDate")
-    val dueDate: String?,
-    @SerializedName("createdAt")
-    val createdAt: String?,
-    @SerializedName("updatedAt")
-    val updatedAt: String?,
-    @SerializedName("rating")
-    val rating: Int?,
-    @SerializedName("tutorName")
-    val tutorName: String?
-)
-
 // Навчальні матеріали
 data class LearningMaterialDTO(
     @SerializedName("materialId")

@@ -36,7 +36,6 @@ interface FocusLearnApi {
         @Header("Authorization") token: String,
         @Body request: StartSessionRequest
     ): Response<ApiResponse<ActiveSessionDTO>>
-
     @GET("timer/status")
     suspend fun getSessionStatus(@Header("Authorization") token: String): Response<ApiResponse<ActiveSessionDTO>>
 
@@ -49,38 +48,6 @@ interface FocusLearnApi {
     @POST("timer/complete-phase")
     suspend fun completeCurrentPhase(@Header("Authorization") token: String): Response<ApiResponse<ActiveSessionDTO>>
 
-    // === ЗАВДАННЯ ===
-    @GET("assignments/all")
-    suspend fun getAvailableAssignments(@Header("Authorization") token: String): Response<ApiResponse<List<AssignmentDTO>>>
-
-    @GET("assignments/my-assignments")
-    suspend fun getMyAssignments(@Header("Authorization") token: String): Response<ApiResponse<List<AssignmentDTO>>>
-
-    @GET("assignments/{id}")
-    suspend fun getAssignmentById(
-        @Path("id") assignmentId: Int,
-        @Header("Authorization") token: String
-    ): Response<ApiResponse<AssignmentDTO>>
-
-    @POST("assignments/{id}/take")
-    suspend fun takeAssignment(
-        @Path("id") assignmentId: Int,
-        @Header("Authorization") token: String
-    ): Response<ApiResponse<Unit>>
-
-    @POST("assignments/{id}/submit")
-    suspend fun submitAssignment(
-        @Path("id") assignmentId: Int,
-        @Header("Authorization") token: String,
-        @Body submitRequest: SubmitAssignmentRequest
-    ): Response<ApiResponse<Unit>>
-
-    @POST("assignments/{id}/complete")
-    suspend fun completeAssignment(
-        @Path("id") assignmentId: Int,
-        @Header("Authorization") token: String
-    ): Response<ApiResponse<Unit>>
-
     // === НАВЧАЛЬНІ МАТЕРІАЛИ ===
     @GET("learningmaterials")
     suspend fun getAllMaterials(): Response<ApiResponse<List<LearningMaterialDTO>>>
@@ -92,7 +59,6 @@ interface FocusLearnApi {
     suspend fun getMaterialById(@Path("id") materialId: Int): Response<ApiResponse<LearningMaterialDTO>>
 
     // === СТАТИСТИКА ===
-    // Цей метод повертає ApiResponse
     @GET("businesslogic/user-statistics")
     suspend fun getUserStatistics(
         @Header("Authorization") token: String,

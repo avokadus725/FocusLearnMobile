@@ -44,13 +44,11 @@ class LanguageManager @Inject constructor(
             context.languageDataStore.edit { preferences ->
                 preferences[LANGUAGE_KEY] = languageCode
             }
-
-            // Застосовуємо мову негайно
             applyLanguageToContext(context, languageCode)
         }
     }
 
-    // Отримання мови синхронно (для негайного використання)
+    // Отримання мови синхронно
     suspend fun getCurrentLanguage(): String {
         return currentLanguage.first()
     }
@@ -76,7 +74,6 @@ class LanguageManager @Inject constructor(
         return context.createConfigurationContext(config)
     }
 
-    // Новий метод для застосування мови до поточної Activity
     fun applyLanguageToActivity(activity: Activity, languageCode: String) {
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
@@ -87,7 +84,6 @@ class LanguageManager @Inject constructor(
         activity.resources.updateConfiguration(config, activity.resources.displayMetrics)
     }
 
-    // Перезапуск Activity для повного застосування мови
     fun restartActivity(activity: Activity) {
         activity.recreate()
     }

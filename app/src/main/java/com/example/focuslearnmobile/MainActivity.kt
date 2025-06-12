@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
                 MainApp(
                     authViewModel = authViewModel,
                     onLanguageChanged = {
-                        // Перезапускаємо Activity для застосування мови
                         recreate()
                     }
                 )
@@ -51,9 +50,7 @@ class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)
-        // Застосовуємо мову до базового контексту
         newBase?.let { context ->
-            // Тут можна застосувати збережену мову, якщо потрібно
         }
     }
 }
